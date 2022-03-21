@@ -15,7 +15,11 @@ func initToken(ch rune) Token {
 
 	switch {
 	case isAlpha(ch):
-		token.TokenType = Id
+		if string(ch) == "i" {
+			token.TokenType = Id_int1
+		} else {
+			token.TokenType = Id
+		}
 		break
 	case isDigit(ch):
 		token.TokenType = IntLiteral
@@ -25,6 +29,21 @@ func initToken(ch rune) Token {
 		break
 	case ch == '<':
 		token.TokenType = LT
+		break
+	case ch == '=':
+		token.TokenType = Assignment
+		break
+	case ch == '+':
+		token.TokenType = Plus
+		break
+	case ch == '-':
+		token.TokenType = Minus
+		break
+	case ch == '*':
+		token.TokenType = Star
+		break
+	case ch == '/':
+		token.TokenType = Slash
 		break
 	default:
 	}
@@ -57,6 +76,7 @@ func isBlank(ch rune) bool {
 }
 
 func tokenize(str string) []Token {
+	tokens = []Token{}
 	var token Token
 
 	for index, ch := range str {
@@ -72,6 +92,37 @@ func tokenize(str string) []Token {
 				token = initToken(ch)
 			}
 			break
+		case Id_int1:
+			if string(ch) == "n" {
+				token.Value = append(token.Value, ch)
+				token.TokenType = Id_int2
+			} else if isAlpha(ch) || (isDigit(ch)) {
+				token.TokenType = Id
+			} else {
+				tokens = append(tokens, token)
+				token = initToken(ch)
+			}
+			break
+		case Id_int2:
+			if string(ch) == "t" {
+				token.Value = append(token.Value, ch)
+				token.TokenType = Id_int3
+			} else if isAlpha(ch) || (isDigit(ch)) {
+				token.TokenType = Id
+			} else {
+				tokens = append(tokens, token)
+				token = initToken(ch)
+			}
+			break
+		case Id_int3:
+			if isBlank(ch) {
+				tokens = append(tokens, token)
+				token.TokenType = Int
+				token = initToken(ch)
+			} else {
+				token.TokenType = Id
+			}
+			break
 		case GT:
 			if ch == '=' {
 				token.TokenType = GE
@@ -85,6 +136,21 @@ func tokenize(str string) []Token {
 			tokens = append(tokens, token)
 			token = initToken(ch)
 			break
+		case Assignment:
+			tokens = append(tokens, token)
+			token = initToken(ch)
+		case Plus:
+			tokens = append(tokens, token)
+			token = initToken(ch)
+		case Minus:
+			tokens = append(tokens, token)
+			token = initToken(ch)
+		case Star:
+			tokens = append(tokens, token)
+			token = initToken(ch)
+		case Slash:
+			tokens = append(tokens, token)
+			token = initToken(ch)
 		case IntLiteral:
 			if isDigit(ch) {
 				token.Value = append(token.Value, ch)
