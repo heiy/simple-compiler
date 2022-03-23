@@ -9,17 +9,18 @@ var tokens []Token
 
 func initToken(ch rune) Token {
 	token := Token{
-		TokenType: Initial,
+		TokenType: INIT,
 		Value:     []rune{ch},
 	}
 
 	switch {
 	case isAlpha(ch):
 		if string(ch) == "i" {
-			token.TokenType = Id_int1
+			token.TokenState = Id_int1
 		} else {
-			token.TokenType = Id
+			token.TokenState = Id
 		}
+		token.TokenType = Identifier
 		break
 	case isDigit(ch):
 		token.TokenType = IntLiteral
@@ -28,10 +29,10 @@ func initToken(ch rune) Token {
 		token.TokenType = GT
 		break
 	case ch == '<':
-		token.TokenType = LT
+		token.TokenType = Less
 		break
 	case ch == '=':
-		token.TokenType = Assignment
+		token.TokenType = Assign
 		break
 	case ch == '+':
 		token.TokenType = Plus
@@ -81,46 +82,50 @@ func tokenize(str string) []Token {
 
 	for index, ch := range str {
 		switch token.TokenType {
-		case Initial:
+		case INIT:
 			token = initToken(ch)
 			break
-		case Id:
-			if isAlpha(ch) || (isDigit(ch)) {
-				token.Value = append(token.Value, ch)
-			} else {
-				tokens = append(tokens, token)
-				token = initToken(ch)
-			}
-			break
-		case Id_int1:
-			if string(ch) == "n" {
-				token.Value = append(token.Value, ch)
-				token.TokenType = Id_int2
-			} else if isAlpha(ch) || (isDigit(ch)) {
-				token.TokenType = Id
-			} else {
-				tokens = append(tokens, token)
-				token = initToken(ch)
-			}
-			break
-		case Id_int2:
-			if string(ch) == "t" {
-				token.Value = append(token.Value, ch)
-				token.TokenType = Id_int3
-			} else if isAlpha(ch) || (isDigit(ch)) {
-				token.TokenType = Id
-			} else {
-				tokens = append(tokens, token)
-				token = initToken(ch)
-			}
-			break
-		case Id_int3:
-			if isBlank(ch) {
-				tokens = append(tokens, token)
-				token.TokenType = Int
-				token = initToken(ch)
-			} else {
-				token.TokenType = Id
+		case Identifier:
+			if token.TokenState == Id {
+				if isAlpha(ch) || (isDigit(ch)) {
+					token.Value = append(token.Value, ch)
+				} else {
+					tokens = append(tokens, token)
+					token = initToken(ch)
+				}
+			} else if token.TokenState == Id_int1 {
+				if string(ch) == "n" {
+					token.Value = append(token.Value, ch)
+					token.TokenState = Id_int2
+				} else if isAlpha(ch) || (isDigit(ch)) {
+					token.TokenState = Id
+				} else {
+					token.TokenState = Id
+					tokens = append(tokens, token)
+					token = initToken(ch)
+				}
+			} else if token.TokenState == Id_int2 {
+				if string(ch) == "t" {
+					token.Value = append(token.Value, ch)
+					token.TokenState = Id_int3
+				} else if isAlpha(ch) || (isDigit(ch)) {
+					token.Value = append(token.Value, ch)
+					token.TokenState = Id
+				} else {
+					token.TokenState = Id
+					tokens = append(tokens, token)
+					token = initToken(ch)
+				}
+			} else if token.TokenState == Id_int3 {
+				if isBlank(ch) {
+					token.TokenState = Int
+					token.TokenType = INT
+					tokens = append(tokens, token)
+					token = initToken(ch)
+				} else {
+					token.Value = append(token.Value, ch)
+					token.TokenState = Id
+				}
 			}
 			break
 		case GT:
@@ -136,7 +141,7 @@ func tokenize(str string) []Token {
 			tokens = append(tokens, token)
 			token = initToken(ch)
 			break
-		case Assignment:
+		case Assign:
 			tokens = append(tokens, token)
 			token = initToken(ch)
 		case Plus:

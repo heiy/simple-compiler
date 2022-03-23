@@ -1,9 +1,46 @@
 package lexer
 
 type TokenType int
+type TokenState int
 
 const (
-	Initial TokenType = iota
+	Plus TokenType = iota
+	Minus
+	Star
+	Slash
+	PPlus
+	PlusEQ
+	GT
+	GE
+	Less
+	LessEQ
+	MinusEQ
+	MMinus
+	StarEQ
+	SlashEQ
+	EQ
+	Assign
+	LeftParen
+	RightParen
+
+	IntLiteral
+	DoubleLiteral
+
+	Identifier
+
+	INT
+	DOUBLE
+	BOOL
+	NIL
+	RUNE
+
+	NULL
+	EOF
+	INIT
+)
+
+const (
+	Initial TokenState = iota
 
 	If
 	Id_if1
@@ -19,26 +56,40 @@ const (
 	Id_int3
 	Id
 
-	GT
-	LT
-	GE
-	LE
-
 	Assignment
 
-	Plus
-	Minus
-	Star
-	Slash
-
 	SemiColon
-	LeftParen
-	RightParen
-
-	IntLiteral
 )
 
 type Token struct {
-	TokenType TokenType
-	Value     []rune
+	TokenType  TokenType
+	TokenState TokenState
+	Value      []rune
+}
+
+type TokenReader struct {
+	Tokens []Token
+	pos    int
+}
+
+func NewTokenReader(tokens []Token) *TokenReader {
+	return &TokenReader{
+		Tokens: tokens,
+		pos:    0,
+	}
+}
+
+func (r *TokenReader) Read() Token {
+	if r.pos < len(r.Tokens) {
+		r.pos++
+		return r.Tokens[r.pos]
+	}
+	return Token{}
+}
+
+func (r *TokenReader) Peek() Token {
+	if r.pos < len(r.Tokens) {
+		return r.Tokens[r.pos]
+	}
+	return Token{}
 }
