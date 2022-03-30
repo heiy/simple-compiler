@@ -4,18 +4,17 @@ type TokenType int
 type TokenState int
 
 const (
-	Plus TokenType = iota
+	INIT TokenType = iota
+	Plus
 	Minus
 	Star
 	Slash
-	PPlus
 	PlusEQ
 	GT
 	GE
 	Less
 	LessEQ
 	MinusEQ
-	MMinus
 	StarEQ
 	SlashEQ
 	EQ
@@ -36,7 +35,8 @@ const (
 
 	NULL
 	EOF
-	INIT
+
+	SemiColon
 )
 
 const (
@@ -55,10 +55,6 @@ const (
 	Id_int2
 	Id_int3
 	Id
-
-	Assignment
-
-	SemiColon
 )
 
 type Token struct {
@@ -69,27 +65,27 @@ type Token struct {
 
 type TokenReader struct {
 	Tokens []Token
-	pos    int
+	Pos    int
 }
 
 func NewTokenReader(tokens []Token) *TokenReader {
 	return &TokenReader{
 		Tokens: tokens,
-		pos:    0,
+		Pos:    0,
 	}
 }
 
 func (r *TokenReader) Read() Token {
-	if r.pos < len(r.Tokens) {
-		r.pos++
-		return r.Tokens[r.pos]
+	if r.Pos < len(r.Tokens)-1 {
+		r.Pos++
+		return r.Tokens[r.Pos]
 	}
 	return Token{}
 }
 
 func (r *TokenReader) Peek() Token {
-	if r.pos < len(r.Tokens) {
-		return r.Tokens[r.pos]
+	if r.Pos < len(r.Tokens) {
+		return r.Tokens[r.Pos]
 	}
 	return Token{}
 }

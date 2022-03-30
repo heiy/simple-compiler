@@ -29,7 +29,7 @@ func TestLexer(t *testing.T) {
 }
 
 func printLexer(str string) {
-	for _, token := range tokenize(str) {
+	for _, token := range Tokenize(str) {
 		log.Printf("%d \t\t %d \t\t %s\n", token.TokenType, token.TokenState, string(token.Value))
 	}
 }

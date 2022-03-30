@@ -76,11 +76,12 @@ func isBlank(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n'
 }
 
-func tokenize(str string) []Token {
+func Tokenize(str string) []Token {
 	tokens = []Token{}
 	var token Token
 
 	for index, ch := range str {
+
 		switch token.TokenType {
 		case INIT:
 			token = initToken(ch)
@@ -147,15 +148,19 @@ func tokenize(str string) []Token {
 		case Plus:
 			tokens = append(tokens, token)
 			token = initToken(ch)
+			break
 		case Minus:
 			tokens = append(tokens, token)
 			token = initToken(ch)
+			break
 		case Star:
 			tokens = append(tokens, token)
 			token = initToken(ch)
+			break
 		case Slash:
 			tokens = append(tokens, token)
 			token = initToken(ch)
+			break
 		case IntLiteral:
 			if isDigit(ch) {
 				token.Value = append(token.Value, ch)
