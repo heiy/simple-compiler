@@ -50,32 +50,26 @@ func intDeclare(tokenReader *lexer.TokenReader) (node *Node) {
 func additive(tokenReader *lexer.TokenReader) (astNode ASTNode) {
 	multiplicativeChild := multiplicative(tokenReader)
 	astNode = multiplicativeChild
-	token := tokenReader.Peek()
 
 	if multiplicativeChild.GetType() == NUll {
 		return
 	}
 
-	if NodeType(token.TokenType) == NUll {
-		return
-	}
-
-	if token.TokenType == lexer.Plus || token.TokenType == lexer.Minus {
-		operator := token.Value
-		token = tokenReader.Read()
-
-		additiveChild := additive(tokenReader)
-
-		if additiveChild.GetType() == NUll {
+	for {
+		token := tokenReader.Peek()
+		if token.TokenType != lexer.Plus && token.TokenType != lexer.Minus {
 			return
 		}
 
+		operator := token.Value
+		token = tokenReader.Read()
+		multiplicativeChild2 := multiplicative(tokenReader)
+
 		astNode = NewNode(Additive, operator)
 		astNode.AddChild(multiplicativeChild)
-		astNode.AddChild(additiveChild)
+		astNode.AddChild(multiplicativeChild2)
+		multiplicativeChild = astNode
 	}
-
-	return
 }
 
 func multiplicative(tokenReader *lexer.TokenReader) (astNode ASTNode) {
